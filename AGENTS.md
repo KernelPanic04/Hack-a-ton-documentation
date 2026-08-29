@@ -259,7 +259,33 @@ Regla: si una dependencia no llegó, **mockea y sigue**. Nadie espera más de 30
 
 ## 6. Protocolo de trabajo y handoff
 
-- Empieza cada tarea revisando este archivo, el README del repo afectado, `main`, trabajo abierto y `DECISION_LOG.md`.
+### Política de ramas obligatoria
+
+- **Backend (`Hack-a-ton-end`) y frontend (`Hack-a-ton-front`):** `dev` es la
+  única rama base para trabajo ordinario. Antes de modificar archivos se debe
+  ejecutar `git fetch origin --prune`, hacer checkout de `dev`, actualizarla
+  solo mediante fast-forward (`git pull --ff-only origin dev`) y comprobar que
+  no se está pisando trabajo local.
+- Desde `dev` actualizado se crea una rama nueva y enfocada antes del primer
+  cambio (`git switch -c <tipo>/<resultado>`). Nunca se implementa ni se crea
+  un commit de producto directamente sobre `dev` o `main`.
+- Todo trabajo de backend/frontend se integra mediante PR o merge de esa rama
+  hacia `dev`, después de ejecutar los checks correspondientes. Justo antes de
+  integrar o publicar se hace otro `fetch` y se reconcilian cambios remotos.
+- La promoción de `dev` a `main` ocurre únicamente en los gates del roadmap o
+  por instrucción explícita de Lane D. `main` se mantiene demostrable.
+- Si `dev` todavía no existe en alguno de los dos repositorios, Lane D la crea
+  una sola vez desde el `main` aprobado; desde ese momento aplica el flujo
+  anterior.
+- **Documentación (`Hack-a-ton-documentation`):** se modifica directamente en
+  `main`. Antes de editar se hace `fetch`, checkout de `main` y actualización
+  fast-forward. No se crea una rama intermedia salvo instrucción explícita de
+  Lane D.
+- Nunca se usa una rama desactualizada como base ni se hace push forzado para
+  resolver divergencias. Se preserva cualquier trabajo ajeno o no versionado.
+
+- Empieza cada tarea revisando este archivo, el README del repo afectado, la
+  rama base definida arriba, trabajo abierto y `DECISION_LOG.md`.
 - Verifica el estado real del código antes de aceptar afirmaciones de planes antiguos.
 - Mantén PRs pequeños y orientados a un solo resultado observable.
 - Preserva trabajo ajeno y no mezcles cambios no relacionados.
