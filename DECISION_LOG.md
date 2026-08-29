@@ -231,6 +231,32 @@ observaciones de red, no un SLO de producción.
   y build pasaron; un smoke local creó v2 y ejecutó el paso inventado hasta
   `STEP_COMPLETED`. Railway y `main` permanecen sin cambios en esta decisión.
 
+## 2026-08-29 · D-015 · Fase 4 y gate G4 cerrados en `dev`
+
+- **Estado:** aceptada, implementada y verificada en `dev`.
+- **Decisión:** cerrar los pasos 4.1–4.7 y el gate H17/G4. El endpoint de
+  versiones acepta `baseVersion`, copia el flow inmutable y anexa el paso nuevo;
+  el editor envía ese contrato, el run ejecuta el flow completo y el executor
+  genérico pausa para revisión cuando corresponde. Al aceptar la revisión se
+  registra `STEP_COMPLETED` antes de completar o continuar el run. El event log
+  queda exportable desde API y frontend.
+- **Alternativas:** crear versiones aisladas de un solo paso; mantener el
+  trial-by-fire como `POST` manual; mover 4.6 al video según el kill criteria.
+- **Razón:** `scripts/smoke_phase4.py` creó un tipo de paso único en runtime,
+  preservó los cinco pasos base, resolvió
+  `delivery_eta.data.final_eta = 2026-09-15`, atravesó las dos decisiones por
+  WebSocket y terminó con timeline `completed`, `generatedBy: deterministic` y
+  eventos `STEP_STARTED`, `DECISION_REQUIRED` y `STEP_COMPLETED`. La validación
+  visual confirmó el mismo paso, input, decisión e inspector sin reiniciar.
+- **Responsable:** Lane D, por instrucción explícita del usuario, con trabajo de
+  Lane B en frontend y coordinación con backend.
+- **Consecuencias:** backend `dev` queda en `317a131` (feature `f19eb64`) y
+  frontend `dev` en `4b9d2f0` (feature `8eed52a`). Backend pasó 53 pruebas,
+  compile/config/diff y el smoke H17; frontend pasó lint, 19 pruebas, build y
+  validación visual. `main` y Railway no se promueven en esta decisión porque
+  la instrucción fue publicar en `dev`. D-013 sigue vigente para observar el
+  upgrade real determinista → LLM de G3 cuando exista una API key en el entorno.
+
 ## Kill criteria vigentes
 
 | Gate | Si falla | Decisión obligatoria |
