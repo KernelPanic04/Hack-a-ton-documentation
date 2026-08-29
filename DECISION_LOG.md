@@ -117,6 +117,50 @@ incluye fecha, decisión, alternativas, razón, responsable y consecuencias.
 - **Consecuencias:** el paso desconocido usa `step`/`compare`; el event log prueba
   que no hubo rebuild o edición de React.
 
+## Evidencia H0.5 · Latencia real de structured outputs
+
+- **Fecha:** 2026-08-29.
+- **Responsable:** Lane C.
+- **Modelo solicitado / servido:** `gpt-5.4-mini` /
+  `gpt-5.4-mini-2026-03-17`.
+- **Ruta:** `POST /v1/responses`, `store: false`, `reasoning.effort: none`;
+  una llamada de red real contra el JSON Schema estricto de `ui_spec_upgrade`.
+- **Resultado:** `completed`; salida validada por Pydantic como
+  `LLMUISpecUpgrade`.
+- **Latencia end-to-end:** **3143.8 ms**.
+- **Uso:** 2,117 tokens de entrada, 145 de salida, 2,262 totales;
+  `serviceTier: default`.
+- **Costo estimado de tokens:** **USD 0.00224**, usando las tarifas públicas
+  vigentes de entrada/salida y sin incluir ajustes ajenos a esos tokens.
+- **Compatibilidad de schema:** el primer intento fue rechazado porque la API no
+  admite `oneOf` en `children`; el adaptador del schema provider-facing lo
+  normaliza a `anyOf`. La validación Pydantic interna conserva la unión
+  discriminada y todos los tests pasan.
+
+### Comparativa repetida · mismo prompt, schema y `serviceTier: default`
+
+Cada configuración tuvo tres llamadas reales no almacenadas. Las cifras son
+observaciones de red, no un SLO de producción.
+
+| Modelo / esfuerzo | Latencia media | Mediana | Tokens salida medios | Costo estimado por llamada | Validación |
+|---|---:|---:|---:|---:|---|
+| `gpt-5.4-nano` / `none` | 2,106.3 ms | 2,236.2 ms | 143 | USD 0.00060 | 3/3 Pydantic OK |
+| `gpt-5.4-mini` / `none` | **1,857.8 ms** | 2,001.1 ms | 146 | USD 0.00224 | 3/3 Pydantic OK |
+| `gpt-5.4-mini` / `low` | 2,023.1 ms | **1,753.4 ms** | 189 | USD 0.00244 | 3/3 Pydantic OK |
+
+## 2026-08-29 · C-001 · Default del composer LLM
+
+- **Estado:** aceptada para la mejora progresiva de Lane C.
+- **Decisión:** usar `gpt-5.4-mini` con `reasoning.effort: none` como default.
+  `gpt-5.4-nano` queda como alternativa de ahorro; `low` se reserva para una
+  evaluación de calidad con escenarios más complejos.
+- **Razón:** en tres muestras comparables, Mini sin razonamiento tuvo la menor
+  latencia media, salida más corta que Mini con `low`, y los tres resultados
+  pasaron el mismo schema. La UI determinista sigue siendo la primera pantalla,
+  así que el LLM no debe pagar razonamiento adicional sin evidencia de mejora.
+- **Consecuencias:** timeout de 5 s y un retry se mantienen; cualquier cambio
+  de modelo/esfuerzo se vuelve a medir contra un set de escenarios representativo.
+
 ## Kill criteria vigentes
 
 | Gate | Si falla | Decisión obligatoria |
@@ -133,5 +177,5 @@ incluye fecha, decisión, alternativas, razón, responsable y consecuencias.
 |---|---|---|
 | A | Pendiente | Revisar `RunProjection`, `RunEvent` e IDs con backend |
 | B | Aprobada por el usuario | Registry, props y tokens implementados |
-| C | Pendiente | Revisar `UISpec`, acciones y compatibilidad structured outputs |
+| C | Aprobada | `UISpec`/acciones revisadas; output estructurado real validado por Pydantic (H0.5) |
 | D | Aprobada por el usuario | Contratos, protocolo y decisiones congelados |
