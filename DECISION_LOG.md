@@ -280,6 +280,34 @@ observaciones de red, no un SLO de producción.
   eventos exportados. La resolución dinámica del upstream queda como hardening
   de Fase 5; futuros pushes a `dev` dispararán deployments automáticos.
 
+## 2026-08-29 · D-017 · Fase 5 cerrada y freeze H20 declarado
+
+- **Estado:** aceptada, desplegada y verificada; freeze absoluto vigente.
+- **Decisión:** cerrar 5.1–5.6 y G5/H20 sobre el runtime determinista como ruta
+  completa y autoritativa. Los upgrades LLM conservan kill switches y siguen
+  siendo opcionales: la ausencia de `OPENAI_API_KEY` no impide generar,
+  persistir, transmitir ni renderizar `UISpec` desde los payloads de la API.
+  Promover el estado validado de `dev` a `main` en frontend y backend.
+- **Alternativas:** bloquear H20 hasta configurar un proveedor LLM en Railway;
+  conservar el proxy estático y redesplegar frontend manualmente después de
+  cada rollout backend; mantener código repository legado y SQL verbose.
+- **Razón:** con ambos LLM apagados, Docker completó G1, G3 policy, G4 y el
+  smoke H20. La suite backend pasó 59 pruebas; frontend pasó lint, 21 pruebas y
+  build. HTTP y WebSocket atravesaron el proxy Nginx local; Railway publicó un
+  árbol contract-safe con `generatedBy: deterministic`. La prueba visual creó
+  un run, confirmó `WebSocket conectado`, mostró `reason`/`stateVersion`, cerró
+  y reabrió la pestaña desde snapshot y continuó a la transición siguiente.
+- **Responsable:** Lane D, por instrucción explícita del usuario.
+- **Consecuencias:** frontend `dev`/`main` quedan en `fb8d411`; backend `dev`
+  queda en `aeab121` y `main` en el merge `5d8b90a`. Railway production quedó
+  verde en los deployments `7518161c-8860-460d-ba13-ff1eaa856dd2` (frontend)
+  y `41242f6c-47fb-4abf-a79f-9da0335068bc` (backend). Nginx refresca el DNS del
+  backend, `SQL_ECHO=false` limpia logs y se eliminó el repository base muerto.
+  Desde este punto, todo cambio de producto es bugfix aprobado por D.
+- **Limitación explícita:** D-013 sigue pendiente únicamente para demostrar el
+  upgrade visual `deterministic → llm` en un entorno con proveedor configurado;
+  no bloquea el runtime determinista ni el freeze H20.
+
 ## Kill criteria vigentes
 
 | Gate | Si falla | Decisión obligatoria |
