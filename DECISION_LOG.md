@@ -257,6 +257,29 @@ observaciones de red, no un SLO de producción.
   la instrucción fue publicar en `dev`. D-013 sigue vigente para observar el
   upgrade real determinista → LLM de G3 cuando exista una API key en el entorno.
 
+## 2026-08-29 · D-016 · Railway despliega Fase 4 desde `dev`
+
+- **Estado:** aceptada, desplegada y verificada en el entorno `production` de
+  Railway.
+- **Decisión:** por instrucción explícita del usuario, conectar los servicios
+  `backend` y `frontend` de Railway a sus ramas `dev` con auto deploy activo y
+  publicar los commits que cerraron G4. Esto no promueve código a `main` y la
+  demo oficial continúa teniendo fallback local.
+- **Alternativas:** conservar la rama obsoleta `codex/hackathon-integration`;
+  volver a deployments manuales por CLI; esperar al cierre completo de Fase 5.
+- **Razón:** Railway seguía ejecutando commits anteriores aunque `dev` ya tenía
+  Fase 4. El usuario autorizó el despliegue y el gate H17 ya estaba verde.
+- **Responsable:** Lane D.
+- **Consecuencias:** backend activo desde `317a131`, deployment
+  `0101f6c0-9ea6-4ed5-98c9-6a3ed54b0389`; frontend activo desde `4b9d2f0`,
+  deployment secuencial `069dafbf-ff00-426e-a6af-664770b9420b`. Un rollout
+  simultáneo dejó temporalmente a Nginx apuntando al contenedor backend previo;
+  redeployar solo frontend después de estabilizar backend restauró el proxy.
+  El smoke público verificó `/health`, `/api/health`, editor, WebSocket, versión
+  de seis pasos, input `2026-09-15`, revisión humana, run `completed` y 29
+  eventos exportados. La resolución dinámica del upstream queda como hardening
+  de Fase 5; futuros pushes a `dev` dispararán deployments automáticos.
+
 ## Kill criteria vigentes
 
 | Gate | Si falla | Decisión obligatoria |
