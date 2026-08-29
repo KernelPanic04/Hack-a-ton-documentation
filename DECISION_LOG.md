@@ -212,6 +212,25 @@ observaciones de red, no un SLO de producción.
   la key en el entorno de demo y capturar esa transición; hasta entonces no se
   inicia el editor visual de Fase 4.
 
+## 2026-08-29 · D-014 · Excepción de secuencia para implementar el editor 4.4
+
+- **Estado:** aceptada e implementada en frontend `dev`; no cierra G3 ni
+  autoriza promoción a `main`.
+- **Decisión:** ejecutar el paso 4.4 por instrucción explícita del usuario,
+  levantando únicamente el editor de workflow sobre los endpoints de Fase 4 ya
+  disponibles en backend. Esta decisión sustituye la espera indicada en D-013
+  para el editor, sin modificar contratos congelados ni el resto del gate H13.
+- **Alternativas:** esperar la observación del upgrade LLM antes de escribir el
+  editor; limitar el trial-by-fire a `POST` manual + JSON.
+- **Razón:** el backend ya expone creación de `v(n+1)`, runs por
+  `workflowVersionId` y executor genérico; el usuario asumió Lane D y ordenó
+  explícitamente implementar 4.4 en frontend.
+- **Responsable:** Lane D, por instrucción explícita del usuario.
+- **Consecuencias:** frontend `dev` queda en `b4f7fb0` con formulario de
+  `StepDefinition`, picker de inputs, diff y “Run with v(n+1)”. Lint, 19 pruebas
+  y build pasaron; un smoke local creó v2 y ejecutó el paso inventado hasta
+  `STEP_COMPLETED`. Railway y `main` permanecen sin cambios en esta decisión.
+
 ## Kill criteria vigentes
 
 | Gate | Si falla | Decisión obligatoria |
