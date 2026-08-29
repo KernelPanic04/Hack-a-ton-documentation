@@ -117,6 +117,25 @@ incluye fecha, decisión, alternativas, razón, responsable y consecuencias.
 - **Consecuencias:** el paso desconocido usa `step`/`compare`; el event log prueba
   que no hubo rebuild o edición de React.
 
+## 2026-08-29 · D-011 · `dev` como base de código y `main` directo para documentación
+
+- **Estado:** aceptada.
+- **Decisión:** backend y frontend parten siempre de `dev`, crean una rama nueva
+  antes de modificar archivos y vuelven a integrar mediante PR o merge hacia
+  `dev`. La documentación se modifica directamente en `main` después de
+  actualizarla por fast-forward. La promoción de código `dev` → `main` queda
+  reservada para gates o autorización explícita de Lane D.
+- **Alternativas:** trabajar directamente en `dev`; usar `main` como base diaria
+  en código; crear ramas también para cada ajuste documental.
+- **Razón:** evita repetir trabajo sobre arquitecturas antiguas, reduce
+  divergencias entre colaboradores y mantiene una ruta de integración común sin
+  añadir fricción innecesaria al repositorio documental.
+- **Responsable:** Lane D, por instrucción explícita del usuario.
+- **Consecuencias:** cada handoff de backend/frontend debe identificar rama base
+  `dev`, rama de trabajo y merge objetivo; frontend establece su rama `dev` desde
+  el `main` aprobado si aún no existe; no se permiten pushes forzados para
+  reconciliar trabajo compartido.
+
 ## Kill criteria vigentes
 
 | Gate | Si falla | Decisión obligatoria |
