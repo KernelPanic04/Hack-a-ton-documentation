@@ -180,6 +180,38 @@ observaciones de red, no un SLO de producción.
 - **Consecuencias:** timeout de 5 s y un retry se mantienen; cualquier cambio
   de modelo/esfuerzo se vuelve a medir contra un set de escenarios representativo.
 
+## 2026-08-29 · D-012 · Gates G1 y G2 cerrados y promovidos
+
+- **Estado:** aceptada y ejecutada.
+- **Decisión:** declarar cerrados G1/H3 y G2/H8 y promover los commits
+  demostrables de `dev` a `main` en backend y frontend.
+- **Alternativas:** mantener las fases 1–2 solo en `dev`; avanzar H13 sin una
+  base demostrable en `main`.
+- **Razón:** el smoke reproducible verificó `WS → renderer → ActionEvent →
+  log`, el golden path de cinco pasos, timeline, anomalía y finalización del
+  run. Backend pasó 39 pruebas; frontend pasó lint, 20 pruebas y build.
+- **Responsable:** Lane D, por autorización explícita del usuario.
+- **Consecuencias:** backend `main` quedó en `d5024f8` y frontend `main` en
+  `0e0952e`; el trabajo ordinario posterior continúa desde `dev`.
+
+## 2026-08-29 · D-013 · Integración H13 en `dev` con promoción condicionada
+
+- **Estado:** implementada en `dev`; gate G3 pendiente de validación runtime LLM.
+- **Decisión:** integrar en `dev` el policy/rechazo stale, snapshot,
+  reconexión/polling, registry completo, inspector y composer LLM progresivo,
+  pero no promover todavía `dev` a `main`.
+- **Alternativas:** promover H13 solo con pruebas unitarias; cortar ya el editor
+  de Fase 4; declarar el gate cerrado sin observar el upgrade real.
+- **Razón:** los checks automáticos y locales están verdes —backend 43 pruebas,
+  frontend lint/24 pruebas/build y Docker build; smokes G1/G2, snapshot y
+  rechazo `STALE_STATE_VERSION`—, pero el entorno local actual no tiene
+  `OPENAI_API_KEY` para observar `deterministic → llm` en el inspector.
+- **Responsable:** Lane D.
+- **Consecuencias:** backend `dev` queda en `6751e65` y frontend `dev` en
+  `18ef0e1`. G3 se cierra y se promueve a `main` únicamente después de inyectar
+  la key en el entorno de demo y capturar esa transición; hasta entonces no se
+  inicia el editor visual de Fase 4.
+
 ## Kill criteria vigentes
 
 | Gate | Si falla | Decisión obligatoria |
